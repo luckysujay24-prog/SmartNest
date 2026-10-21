@@ -42,10 +42,10 @@ export const BillsManagement: React.FC<BillsManagementProps> = ({
   // Single Bill Modal
   const [isSingleModalOpen, setIsSingleModalOpen] = useState(false);
   const [singleFlatId, setSingleFlatId] = useState('');
-  const [singleBillType, setSingleBillType] = useState<BillType>('RENT');
+  const [singleBillType, setSingleBillType] = useState<BillType>('MAINTENANCE');
   const [singleTitle, setSingleTitle] = useState('');
   const [singleDescription, setSingleDescription] = useState('');
-  const [singleAmount, setSingleAmount] = useState(35000);
+  const [singleAmount, setSingleAmount] = useState(4000);
   const [singlePeriodStart, setSinglePeriodStart] = useState('2026-09-01');
   const [singlePeriodEnd, setSinglePeriodEnd] = useState('2026-09-30');
   const [singleDueDate, setSingleDueDate] = useState('2026-09-15');
@@ -73,6 +73,9 @@ export const BillsManagement: React.FC<BillsManagementProps> = ({
   }, []);
 
   const filteredBills = bills.filter((b) => {
+    // Privacy boundary: Admins manage society dues only, not private owner-tenant rent
+    if (b.bill_type === 'RENT') return false;
+
     const matchesSearch =
       b.title.toLowerCase().includes(search.toLowerCase()) ||
       (b.flat_number && b.flat_number.toLowerCase().includes(search.toLowerCase())) ||
@@ -151,9 +154,9 @@ export const BillsManagement: React.FC<BillsManagementProps> = ({
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Billing & Community Expenses</h1>
+          <h1 className="text-xl font-bold text-slate-900">Society Maintenance & Common Funds</h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Issue flat-wise rent, individual utility meter charges, and split common society expenses.
+            Manage society maintenance charges, utility sub-meters, and split common society expenses. (Private lease rent is managed exclusively between property owners and tenants).
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -189,10 +192,9 @@ export const BillsManagement: React.FC<BillsManagementProps> = ({
             leftIcon={<Search className="w-4 h-4" />}
           />
           <Select value={selectedType} onChange={(e) => setSelectedType(e.target.value)}>
-            <option value="ALL">All Bill Types</option>
-            <option value="RENT">Rent Only</option>
-            <option value="ELECTRICITY">Electricity Only</option>
+            <option value="ALL">All Society Bill Types</option>
             <option value="MAINTENANCE">Maintenance Only</option>
+            <option value="ELECTRICITY">Electricity Only</option>
             <option value="COMMON_WATER">Common Water Share</option>
             <option value="COMMON_ELECTRICITY">Common Power</option>
             <option value="SECURITY">Security Expenses</option>
@@ -334,10 +336,7 @@ export const BillsManagement: React.FC<BillsManagementProps> = ({
                 const val = e.target.value as BillType;
                 setSingleBillType(val);
                 const flat = flats.find((f) => f.id === singleFlatId);
-                if (val === 'RENT' && flat) {
-                  setSingleTitle(`Monthly Rent - Flat ${flat.flat_number}`);
-                  setSingleAmount(flat.rent_amount);
-                } else if (val === 'MAINTENANCE' && flat) {
+                if (val === 'MAINTENANCE' && flat) {
                   setSingleTitle(`Society Maintenance - Flat ${flat.flat_number}`);
                   setSingleAmount(flat.maintenance_amount);
                 } else if (val === 'ELECTRICITY') {
@@ -346,13 +345,12 @@ export const BillsManagement: React.FC<BillsManagementProps> = ({
                 }
               }}
             >
-              <option value="RENT">Rent</option>
-              <option value="ELECTRICITY">Electricity</option>
-              <option value="MAINTENANCE">Maintenance</option>
-              <option value="GAS">Gas Supply</option>
-              <option value="WATER">Water Meter</option>
-              <option value="INTERNET">Broadband Facility</option>
-              <option value="OTHER">Other Assessment</option>
+              <option value="MAINTENANCE">Society Maintenance</option>
+              <option value="ELECTRICITY">Electricity Sub-Meter</option>
+              <option value="WATER">Water Meter Charges</option>
+              <option value="GAS">Piped Gas Supply</option>
+              <option value="INTERNET">Broadband Infrastructure</option>
+              <option value="OTHER">Other Society Assessment</option>
             </Select>
 
             <Input

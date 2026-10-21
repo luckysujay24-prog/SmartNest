@@ -1,0 +1,43 @@
+[
+  {
+    "_id": "vlog-01",
+    "community_id": "comm-101",
+    "visitor_name": "Ramesh Swiggy Delivery",
+    "visitor_phone": "+91 98451 90123",
+    "purpose": "DELIVERY",
+    "destination_flat": "A-301",
+    "vehicle_number": "KA-04-EK-9912",
+    "entry_time": "2026-10-07 12:45 PM",
+    "status": "ALLOWED",
+    "recorded_by": "Suresh Reddy (Gate Watchman)",
+    "photo_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150",
+    "created_at": "2026-10-07T12:45:00.000Z"
+  },
+  {
+    "_id": "vlog-02",
+    "community_id": "comm-101",
+    "visitor_name": "Manish Kumar (Zomato)",
+    "visitor_phone": "+91 98220 44112",
+    "purpose": "DELIVERY",
+    "destination_flat": "A-101",
+    "vehicle_number": "KA-03-MR-1204",
+    "entry_time": "2026-10-07 01:10 PM",
+    "status": "ALLOWED",
+    "recorded_by": "Suresh Reddy (Gate Watchman)",
+    "created_at": "2026-10-07T13:10:00.000Z"
+  },
+  {
+    "_id": "vlog-03",
+    "community_id": "comm-101",
+    "visitor_name": "Unverified Sales Vendor",
+    "visitor_phone": "+91 99000 88776",
+    "purpose": "COMMERCIAL",
+    "destination_flat": "None (Door to Door)",
+    "vehicle_number": "None",
+    "entry_time": "2026-10-07 10:15 AM",
+    "status": "DENIED",
+    "recorded_by": "Suresh Reddy (Gate Watchman)",
+    "remarks": "Unauthorized commercial canvassing prohibited in society.",
+    "created_at": "2026-10-07T10:15:00.000Z"
+  }
+]

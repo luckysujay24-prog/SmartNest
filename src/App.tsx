@@ -19,6 +19,11 @@ import { ComplaintsManagement } from './components/admin/ComplaintsManagement';
 import { AnnouncementsManagement } from './components/admin/AnnouncementsManagement';
 import { ServicesManagement } from './components/admin/ServicesManagement';
 import { AuditTrail } from './components/admin/AuditTrail';
+import { AllResidentsManagement } from './components/admin/AllResidentsManagement';
+import { SuperAdminPortal } from './components/admin/SuperAdminPortal';
+import { SecurityGuardPortal } from './components/security/SecurityGuardPortal';
+import { ServiceBookingPortal } from './components/services/ServiceBookingPortal';
+import { PrivateChatView } from './components/chat/PrivateChatView';
 
 // Owner Views
 import { OwnerDashboard } from './components/owner/OwnerDashboard';
@@ -46,6 +51,7 @@ const MainApp: React.FC = () => {
   const { currentUser, loginAsRole } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>('dashboard');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeChatPartnerId, setActiveChatPartnerId] = useState<string | undefined>(undefined);
 
   // Global Action Modals from Dashboard triggers
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -96,6 +102,81 @@ const MainApp: React.FC = () => {
   const renderCurrentView = () => {
     const role = currentUser.role;
 
+    // --- SUPER ADMIN VIEWS ---
+    if (role === 'SUPER_ADMIN') {
+      switch (currentTab) {
+        case 'super-admin':
+        case 'dashboard':
+          return (
+            <SuperAdminPortal
+              onOpenChatWithAdmin={(adminId) => {
+                setActiveChatPartnerId(adminId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
+        case 'directory':
+          return (
+            <AllResidentsManagement
+              onOpenChatWithUser={(partnerId) => {
+                setActiveChatPartnerId(partnerId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
+        case 'security':
+          return <SecurityGuardPortal />;
+        case 'services':
+        case 'bookings':
+          return (
+            <ServiceBookingPortal
+              onOpenChatWithWorker={(workerUserId) => {
+                setActiveChatPartnerId(workerUserId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
+        case 'chat':
+          return (
+            <PrivateChatView
+              initialPartnerId={activeChatPartnerId}
+              onClose={() => setCurrentTab('super-admin')}
+            />
+          );
+        case 'audit':
+          return <AuditTrail />;
+        default:
+          return (
+            <SuperAdminPortal
+              onOpenChatWithAdmin={(adminId) => {
+                setActiveChatPartnerId(adminId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
+      }
+    }
+
+    // --- SECURITY / WATCHMAN VIEWS ---
+    if (role === 'SECURITY') {
+      switch (currentTab) {
+        case 'security':
+        case 'dashboard':
+          return <SecurityGuardPortal />;
+        case 'chat':
+          return (
+            <PrivateChatView
+              initialPartnerId={activeChatPartnerId}
+              onClose={() => setCurrentTab('security')}
+            />
+          );
+        case 'announcements':
+          return <AnnouncementsManagement />;
+        default:
+          return <SecurityGuardPortal />;
+      }
+    }
+
     // --- ADMIN VIEWS ---
     if (role === 'ADMIN') {
       switch (currentTab) {
@@ -118,6 +199,24 @@ const MainApp: React.FC = () => {
               }}
             />
           );
+        case 'directory':
+          return (
+            <AllResidentsManagement
+              onOpenChatWithUser={(partnerId) => {
+                setActiveChatPartnerId(partnerId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
+        case 'security':
+          return <SecurityGuardPortal />;
+        case 'chat':
+          return (
+            <PrivateChatView
+              initialPartnerId={activeChatPartnerId}
+              onClose={() => setCurrentTab('dashboard')}
+            />
+          );
         case 'flats':
           return <FlatsManagement />;
         case 'owners':
@@ -135,7 +234,15 @@ const MainApp: React.FC = () => {
         case 'announcements':
           return <AnnouncementsManagement initialOpenCreate={openAnnouncementModal} />;
         case 'services':
-          return <ServicesManagement />;
+        case 'bookings':
+          return (
+            <ServiceBookingPortal
+              onOpenChatWithWorker={(workerUserId) => {
+                setActiveChatPartnerId(workerUserId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
         case 'audit':
           return <AuditTrail />;
         default:
@@ -156,6 +263,13 @@ const MainApp: React.FC = () => {
       switch (currentTab) {
         case 'dashboard':
           return <OwnerDashboard onNavigateTab={(tab) => setCurrentTab(tab)} />;
+        case 'chat':
+          return (
+            <PrivateChatView
+              initialPartnerId={activeChatPartnerId}
+              onClose={() => setCurrentTab('dashboard')}
+            />
+          );
         case 'properties':
           return <OwnerProperties />;
         case 'tenants':
@@ -168,7 +282,15 @@ const MainApp: React.FC = () => {
         case 'announcements':
           return <AnnouncementsManagement />;
         case 'services':
-          return <ServicesManagement />;
+        case 'bookings':
+          return (
+            <ServiceBookingPortal
+              onOpenChatWithWorker={(workerUserId) => {
+                setActiveChatPartnerId(workerUserId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
         case 'profile':
           return <TenantProfile />;
         default:
@@ -189,6 +311,13 @@ const MainApp: React.FC = () => {
               }}
             />
           );
+        case 'chat':
+          return (
+            <PrivateChatView
+              initialPartnerId={activeChatPartnerId}
+              onClose={() => setCurrentTab('dashboard')}
+            />
+          );
         case 'my-flat':
           return <TenantProfile />;
         case 'rent-bills':
@@ -200,7 +329,15 @@ const MainApp: React.FC = () => {
         case 'announcements':
           return <AnnouncementsManagement />;
         case 'services':
-          return <TenantServices />;
+        case 'bookings':
+          return (
+            <ServiceBookingPortal
+              onOpenChatWithWorker={(workerUserId) => {
+                setActiveChatPartnerId(workerUserId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
         case 'profile':
           return <TenantProfile />;
         default:
@@ -218,8 +355,24 @@ const MainApp: React.FC = () => {
       switch (currentTab) {
         case 'dashboard':
           return <WorkerDashboard onNavigateTab={(tab) => setCurrentTab(tab)} />;
+        case 'chat':
+          return (
+            <PrivateChatView
+              initialPartnerId={activeChatPartnerId}
+              onClose={() => setCurrentTab('dashboard')}
+            />
+          );
         case 'tasks':
           return <WorkerTasks />;
+        case 'bookings':
+          return (
+            <ServiceBookingPortal
+              onOpenChatWithWorker={(workerUserId) => {
+                setActiveChatPartnerId(workerUserId);
+                setCurrentTab('chat');
+              }}
+            />
+          );
         case 'history':
           return <WorkerTaskHistory />;
         case 'profile':
@@ -239,7 +392,12 @@ const MainApp: React.FC = () => {
         isMobileMenuOpen={isMobileMenuOpen}
         onToggleMobileMenu={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
         onNavigateHome={() => setCurrentTab('dashboard')}
+        onOpenChat={() => {
+          setActiveChatPartnerId(undefined);
+          setCurrentTab('chat');
+        }}
       />
+
 
       {/* Main Workspace Layout */}
       <div className="flex-1 flex overflow-hidden">

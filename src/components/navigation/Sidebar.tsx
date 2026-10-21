@@ -18,6 +18,12 @@ import {
   Clock,
   Sparkles,
   Layers,
+  MessageSquare,
+  CalendarCheck,
+  UserCheck,
+  ShieldCheck,
+  Building2,
+  AlertTriangle,
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -42,18 +48,40 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const renderNavItems = () => {
+    if (role === 'SUPER_ADMIN') {
+      return [
+        { id: 'super-admin', label: 'All Apartments & Admins', icon: Building2 },
+        { id: 'directory', label: 'All Residents & Staff', icon: Users },
+        { id: 'security', label: 'Gate Visitor Registers', icon: ShieldCheck },
+        { id: 'services', label: 'Service Bookings', icon: Store },
+        { id: 'chat', label: 'Private Messages', icon: MessageSquare },
+        { id: 'audit', label: 'Central Audit Trail', icon: FileClock },
+      ];
+    }
+
+    if (role === 'SECURITY') {
+      return [
+        { id: 'security', label: 'Gate Register & Problems', icon: ShieldCheck },
+        { id: 'chat', label: 'Private Messages', icon: MessageSquare },
+        { id: 'announcements', label: 'Society Announcements', icon: Megaphone },
+      ];
+    }
+
     if (role === 'ADMIN') {
       return [
         { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+        { id: 'directory', label: 'All Residents (See Anyone)', icon: Users },
+        { id: 'security', label: 'Watchman Gate Register', icon: ShieldCheck },
+        { id: 'chat', label: 'Private Messages', icon: MessageSquare },
         { id: 'flats', label: 'Flats & Units', icon: Building },
         { id: 'owners', label: 'Owners', icon: KeyRound },
-        { id: 'tenants', label: 'Tenants', icon: Users },
+        { id: 'tenants', label: 'Tenants', icon: UserCheck },
         { id: 'workers', label: 'Workers & Staff', icon: Wrench },
         { id: 'bills', label: 'Bills & Allocation', icon: Receipt },
         { id: 'payments', label: 'Payments & Ledger', icon: CreditCard },
         { id: 'complaints', label: 'Complaints & Work', icon: AlertCircle },
         { id: 'announcements', label: 'Announcements', icon: Megaphone },
-        { id: 'services', label: 'Service Directory', icon: Store },
+        { id: 'services', label: 'Service Booking Portal', icon: Store },
         { id: 'audit', label: 'Audit Trail', icon: FileClock },
       ];
     }
@@ -61,13 +89,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (role === 'OWNER') {
       return [
         { id: 'dashboard', label: 'Overview', icon: LayoutDashboard },
+        { id: 'chat', label: 'Private Messages', icon: MessageSquare },
         { id: 'properties', label: 'My Properties', icon: Building },
         { id: 'tenants', label: 'Tenants', icon: Users },
         { id: 'bills', label: 'Rent & Bills', icon: Receipt },
         { id: 'payments', label: 'Collections History', icon: CreditCard },
         { id: 'complaints', label: 'Complaints', icon: AlertCircle },
         { id: 'announcements', label: 'Announcements', icon: Megaphone },
-        { id: 'services', label: 'Local Services', icon: Store },
+        { id: 'services', label: 'Services & Book Slots', icon: Store },
         { id: 'profile', label: 'Profile', icon: User },
       ];
     }
@@ -75,12 +104,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (role === 'TENANT') {
       return [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+        { id: 'chat', label: 'Private Messages', icon: MessageSquare },
+        { id: 'services', label: 'Services & Book Slots', icon: Store },
         { id: 'my-flat', label: 'My Flat', icon: Home },
         { id: 'rent-bills', label: 'Rent & Bills', icon: Receipt },
         { id: 'payments', label: 'Payment History', icon: CreditCard },
         { id: 'complaints', label: 'Complaints', icon: AlertCircle },
         { id: 'announcements', label: 'Announcements', icon: Megaphone },
-        { id: 'services', label: 'Nearby Services', icon: Store },
         { id: 'profile', label: 'Profile', icon: User },
       ];
     }
@@ -88,7 +118,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
     if (role === 'WORKER') {
       return [
         { id: 'dashboard', label: 'Task Center', icon: LayoutDashboard },
+        { id: 'chat', label: 'Private Messages', icon: MessageSquare },
         { id: 'tasks', label: 'Assigned Tasks', icon: Wrench },
+        { id: 'bookings', label: 'Booked Appointments', icon: CalendarCheck },
         { id: 'history', label: 'Task History', icon: CheckCircle },
         { id: 'profile', label: 'My Profile & Status', icon: User },
       ];
@@ -109,9 +141,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
           </div>
           <div className="min-w-0">
             <h4 className="text-xs font-bold text-white uppercase tracking-wider truncate">
-              {currentUser.role} CONSOLE
+              {currentUser.role.replace('_', ' ')} CONSOLE
             </h4>
-            <p className="text-[11px] text-slate-400 truncate">Grand Palms Residency</p>
+            <p className="text-[11px] text-slate-400 truncate">
+              {currentUser.role === 'SUPER_ADMIN'
+                ? 'All Apartments (Central)'
+                : currentUser.apartment_name || 'Grand Palms Residency'}
+            </p>
           </div>
         </div>
       </div>
@@ -141,7 +177,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {/* Footer Info */}
       <div className="p-3 border-t border-slate-800/80 text-[11px] text-slate-400 bg-slate-950/40">
         <div className="flex items-center justify-between">
-          <span>v1.0 Production</span>
+          <span>v2.0 Multi-Apartment</span>
           <span className="inline-flex items-center gap-1 text-emerald-400 font-medium">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Live
           </span>

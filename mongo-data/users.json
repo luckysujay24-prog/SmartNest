@@ -1,0 +1,203 @@
+[
+  {
+    "_id": "usr-superadmin-1",
+    "email": "karthik@smartnest.in",
+    "name": "Karthik Sriram (Platform Super Admin)",
+    "phone": "+91 99000 11111",
+    "role": "SUPER_ADMIN",
+    "apartment_name": "All Apartments (Central HQ)",
+    "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-admin-1",
+    "email": "sunita.admin@grandpalms.in",
+    "name": "Sunita Deshmukh (Society Admin)",
+    "phone": "+91 98765 43210",
+    "role": "ADMIN",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "avatar_url": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-admin-2",
+    "email": "vikram.admin@shantiniketan.in",
+    "name": "Vikram Gokhale (Society Admin)",
+    "phone": "+91 98230 44551",
+    "role": "ADMIN",
+    "community_id": "comm-102",
+    "apartment_name": "Shanti Niketan Haven",
+    "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-admin-3",
+    "email": "srinivas.admin@suryaemerald.in",
+    "name": "Srinivas Rao (Society Admin)",
+    "phone": "+91 98480 33221",
+    "role": "ADMIN",
+    "community_id": "comm-103",
+    "apartment_name": "Surya Emerald Heights",
+    "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-security-1",
+    "email": "suresh.security@grandpalms.in",
+    "name": "Suresh Reddy (Gate Watchman)",
+    "phone": "+91 98455 77889",
+    "role": "SECURITY",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-security-2",
+    "email": "tukaram.security@shantiniketan.in",
+    "name": "Tukaram Patil (Gate Watchman)",
+    "phone": "+91 98221 55667",
+    "role": "SECURITY",
+    "community_id": "comm-102",
+    "apartment_name": "Shanti Niketan Haven",
+    "avatar_url": "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-security-3",
+    "email": "mallikarjun.security@suryaemerald.in",
+    "name": "Mallikarjun Rao (Gate Watchman)",
+    "phone": "+91 98491 66778",
+    "role": "SECURITY",
+    "community_id": "comm-103",
+    "apartment_name": "Surya Emerald Heights",
+    "avatar_url": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-owner-1",
+    "email": "rajesh.owner@gmail.com",
+    "name": "Rajesh Kumar (Owner)",
+    "phone": "+91 98450 11223",
+    "role": "OWNER",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "avatar_url": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-owner-2",
+    "email": "priya.owner@gmail.com",
+    "name": "Priya Sharma (Owner)",
+    "phone": "+91 99123 44556",
+    "role": "OWNER",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "avatar_url": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-owner-3",
+    "email": "nilesh.owner@gmail.com",
+    "name": "Nilesh Kulkarni (Owner)",
+    "phone": "+91 98224 66778",
+    "role": "OWNER",
+    "community_id": "comm-102",
+    "apartment_name": "Shanti Niketan Haven",
+    "avatar_url": "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-owner-5",
+    "email": "venkat.owner@gmail.com",
+    "name": "Venkat Ramana (Owner)",
+    "phone": "+91 98492 55667",
+    "role": "OWNER",
+    "community_id": "comm-103",
+    "apartment_name": "Surya Emerald Heights",
+    "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-tenant-1",
+    "email": "ananya.tenant@gmail.com",
+    "name": "Ananya Iyer (Tenant)",
+    "phone": "+91 97400 98765",
+    "role": "TENANT",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "flat_id": "flat-a-301",
+    "avatar_url": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-tenant-2",
+    "email": "rohan.tenant@gmail.com",
+    "name": "Rohan Mehta (Tenant)",
+    "phone": "+91 98200 12345",
+    "role": "TENANT",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "flat_id": "flat-a-101",
+    "avatar_url": "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-tenant-3",
+    "email": "aditya.tenant@gmail.com",
+    "name": "Aditya Joshi (Tenant)",
+    "phone": "+91 98233 77889",
+    "role": "TENANT",
+    "community_id": "comm-102",
+    "apartment_name": "Shanti Niketan Haven",
+    "flat_id": "flat-sn-101",
+    "avatar_url": "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-tenant-4",
+    "email": "harish.tenant@gmail.com",
+    "name": "Harish Reddy (Tenant)",
+    "phone": "+91 98490 88990",
+    "role": "TENANT",
+    "community_id": "comm-103",
+    "apartment_name": "Surya Emerald Heights",
+    "flat_id": "flat-se-201",
+    "avatar_url": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-worker-1",
+    "email": "ramesh.electrician@smartnest.in",
+    "name": "Ramesh Verma (Electrician)",
+    "phone": "+91 98711 22334",
+    "role": "WORKER",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "avatar_url": "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-worker-2",
+    "email": "ravi.plumber@smartnest.in",
+    "name": "Ravi Kumar (Plumber)",
+    "phone": "+91 98722 33445",
+    "role": "WORKER",
+    "community_id": "comm-101",
+    "apartment_name": "Grand Palms Residency",
+    "avatar_url": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  },
+  {
+    "_id": "usr-worker-3",
+    "email": "manoj.actech@smartnest.in",
+    "name": "Manoj Pandey (HVAC & AC Tech)",
+    "phone": "+91 98733 44556",
+    "role": "WORKER",
+    "community_id": "comm-102",
+    "apartment_name": "Shanti Niketan Haven",
+    "avatar_url": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=250&auto=format&fit=crop&q=80",
+    "is_active": true
+  }
+]

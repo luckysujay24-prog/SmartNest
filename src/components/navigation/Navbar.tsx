@@ -1,25 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../services/authContext';
 import { NotificationBell } from '../common/NotificationBell';
-import { Building2, UserCog, LogOut, Menu, X, Shield, KeyRound, Wrench, Home } from 'lucide-react';
+import { storage } from '../../services/storage';
+import { Building2, LogOut, Menu, X, Shield, KeyRound, Wrench, Home, MessageSquare, Database } from 'lucide-react';
 import { UserRole } from '../../types';
 
 interface NavbarProps {
   onToggleMobileMenu: () => void;
   isMobileMenuOpen: boolean;
   onNavigateHome?: () => void;
+  onOpenChat?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onToggleMobileMenu,
   isMobileMenuOpen,
   onNavigateHome,
+  onOpenChat,
 }) => {
-  const { currentUser, loginAsRole, logout, allUsers, switchUser } = useAuth();
-  const [roleSwitcherOpen, setRoleSwitcherOpen] = useState(false);
+  const { currentUser, logout } = useAuth();
+  const [unreadChatCount, setUnreadChatCount] = useState(0);
+
+  useEffect(() => {
+    if (!currentUser) return;
+    const updateCount = () => {
+      setUnreadChatCount(storage.getUnreadMessageCount(currentUser.id));
+    };
+    updateCount();
+    const unsub = storage.subscribe(updateCount);
+    return unsub;
+  }, [currentUser]);
 
   const getRoleIcon = (role?: UserRole) => {
     switch (role) {
+      case 'SUPER_ADMIN':
+        return <Building2 className="w-3.5 h-3.5 text-indigo-600" />;
+      case 'SECURITY':
+        return <Shield className="w-3.5 h-3.5 text-amber-600" />;
       case 'ADMIN':
         return <Shield className="w-3.5 h-3.5 text-rose-600" />;
       case 'OWNER':
@@ -35,6 +52,10 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   const getRoleBadgeClasses = (role?: UserRole) => {
     switch (role) {
+      case 'SUPER_ADMIN':
+        return 'bg-indigo-50 text-indigo-800 border-indigo-200';
+      case 'SECURITY':
+        return 'bg-amber-50 text-amber-800 border-amber-200';
       case 'ADMIN':
         return 'bg-rose-50 text-rose-700 border-rose-200';
       case 'OWNER':
@@ -71,93 +92,45 @@ export const Navbar: React.FC<NavbarProps> = ({
             </div>
             <div>
               <span className="text-base font-bold tracking-tight text-slate-900 leading-none block">
-                Community<span className="text-blue-600">Hub</span>
+                Smart<span className="text-blue-600">Nest</span>
               </span>
-              <span className="text-[10px] text-slate-500 font-medium leading-none block mt-0.5">
-                Grand Palms Residency
+              <span className="text-[10px] text-slate-500 font-medium leading-none block mt-0.5 truncate max-w-[200px]">
+                {currentUser?.role === 'SUPER_ADMIN'
+                  ? 'All Apartments (Central)'
+                  : currentUser?.apartment_name || 'Grand Palms Residency'}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Right: Quick Role Switcher, Notifications, User Info */}
+        {/* Right: MongoDB Compass Badge, Private Chat, Notifications, User Info */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Quick Role Switcher Banner */}
-          <div className="relative">
+          {/* MongoDB Compass Status Badge */}
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 text-xs rounded-full border border-emerald-200 bg-emerald-50 text-emerald-800 font-medium shadow-2xs">
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            <Database className="w-3.5 h-3.5 text-emerald-600" />
+            <span className="text-[11px] font-semibold">MongoDB Compass Active</span>
+          </div>
+
+          {/* 1-on-1 Private Chat Button */}
+          {currentUser && onOpenChat && (
             <button
               type="button"
-              onClick={() => setRoleSwitcherOpen(!roleSwitcherOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 font-medium transition-all cursor-pointer shadow-2xs"
+              onClick={onOpenChat}
+              title="Open Private 1-on-1 Messages (Strictly Private)"
+              className="relative p-2 rounded-lg text-slate-600 hover:text-blue-600 hover:bg-blue-50 transition-colors cursor-pointer border border-slate-200/80 shadow-2xs"
             >
-              <UserCog className="w-3.5 h-3.5 text-blue-600" />
-              <span className="hidden sm:inline">Role:</span>
-              <span className="font-bold text-slate-900 capitalize">{currentUser?.role.toLowerCase()}</span>
-              <span className="text-[10px] text-blue-600 bg-blue-100/70 px-1 rounded">Switch</span>
+              <MessageSquare className="w-4 h-4" />
+              {unreadChatCount > 0 && (
+                <span className="absolute -top-1 -right-1 flex h-4 min-w-[16px] px-1 items-center justify-center rounded-full bg-blue-600 text-[10px] font-bold text-white shadow-xs animate-pulse">
+                  {unreadChatCount}
+                </span>
+              )}
             </button>
-
-            {roleSwitcherOpen && (
-              <div
-                className="absolute right-0 mt-2 w-64 rounded-xl bg-white shadow-xl border border-slate-200 p-2 z-50 animate-in fade-in zoom-in-95 text-left"
-                onClick={() => setRoleSwitcherOpen(false)}
-              >
-                <div className="px-2 py-1.5 text-[11px] font-bold uppercase tracking-wider text-slate-400 border-b border-slate-100 mb-1">
-                  Switch Testing Persona
-                </div>
-
-                <button
-                  onClick={() => loginAsRole('ADMIN')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs text-left transition-colors cursor-pointer ${
-                    currentUser?.role === 'ADMIN' ? 'bg-rose-50 font-bold text-rose-900' : 'hover:bg-slate-50 text-slate-700'
-                  }`}
-                >
-                  <Shield className="w-4 h-4 text-rose-600" />
-                  <div>
-                    <div className="leading-tight font-semibold">Admin (Sarah Connor)</div>
-                    <div className="text-[10px] text-slate-400">Full community operations</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => loginAsRole('OWNER')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs text-left transition-colors cursor-pointer ${
-                    currentUser?.role === 'OWNER' ? 'bg-purple-50 font-bold text-purple-900' : 'hover:bg-slate-50 text-slate-700'
-                  }`}
-                >
-                  <KeyRound className="w-4 h-4 text-purple-600" />
-                  <div>
-                    <div className="leading-tight font-semibold">Owner (Rajesh Kumar)</div>
-                    <div className="text-[10px] text-slate-400">Flats A-301 & B-502</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => loginAsRole('TENANT')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs text-left transition-colors cursor-pointer ${
-                    currentUser?.role === 'TENANT' ? 'bg-blue-50 font-bold text-blue-900' : 'hover:bg-slate-50 text-slate-700'
-                  }`}
-                >
-                  <Home className="w-4 h-4 text-blue-600" />
-                  <div>
-                    <div className="leading-tight font-semibold">Tenant (Emily Watson)</div>
-                    <div className="text-[10px] text-slate-400">Flat A-301 (Sunflower)</div>
-                  </div>
-                </button>
-
-                <button
-                  onClick={() => loginAsRole('WORKER')}
-                  className={`w-full flex items-center gap-2 px-2.5 py-2 rounded-lg text-xs text-left transition-colors cursor-pointer ${
-                    currentUser?.role === 'WORKER' ? 'bg-amber-50 font-bold text-amber-900' : 'hover:bg-slate-50 text-slate-700'
-                  }`}
-                >
-                  <Wrench className="w-4 h-4 text-amber-600" />
-                  <div>
-                    <div className="leading-tight font-semibold">Worker (David Vance)</div>
-                    <div className="text-[10px] text-slate-400">Master Electrician</div>
-                  </div>
-                </button>
-              </div>
-            )}
-          </div>
+          )}
 
           <NotificationBell />
 

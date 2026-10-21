@@ -1,0 +1,68 @@
+========================================================================
+SMARTNEST - RESIDENTIAL MANAGEMENT OS
+How to Run Whenever You Need to Open the Website
+========================================================================
+
+QUICK 1-CLICK LAUNCH:
+--------------------
+Whenever you want to use the website, simply DOUBLE-CLICK:
+   START_SMARTNEST.bat
+
+What it does automatically:
+1. Verifies Node.js & dependencies.
+2. Connects to your local MongoDB server (port 27017).
+3. Verifies and seeds the "smartnest" database.
+4. Starts the Backend Express API on http://localhost:5000.
+5. Starts the Frontend Vite UI on http://localhost:3000.
+6. Automatically launches your default web browser to:
+   http://localhost:3000
+
+
+HOW TO STOP THE WEBSITE:
+-----------------------
+When you are done using SmartNest, double-click:
+   STOP_SMARTNEST.bat
+This cleanly shuts down both port 3000 and port 5000 servers.
+
+
+HOW TO VIEW YOUR DATA IN MONGODB COMPASS:
+----------------------------------------
+1. Open MongoDB Compass on your computer.
+2. Keep the connection string as:
+   mongodb://127.0.0.1:27017
+3. Click "Connect".
+4. In the left panel, click on the database "smartnest".
+5. You will see all 12 collections:
+   - communities (Grand Palms, Shanti Niketan, Surya Emerald)
+   - buildings
+   - flats
+   - users (Super Admin, Society Admins, Owners, Tenants, Watchmen, Technicians)
+   - bills (Society maintenance & private rent)
+   - payments
+   - visitor_logs (Outsider gate register)
+   - incident_reports (Facility problems)
+   - service_bookings (Electrician, Plumber slot appointments)
+   - private_messages (1-on-1 chats)
+   - complaints
+   - announcements
+
+(Note: All collections are also backed up as readable JSON files inside the
+"mongo-data\" folder for manual inspection or manual Compass import anytime!)
+
+
+MANUAL COMMAND LINE (If you prefer terminal):
+--------------------------------------------
+1. Start Backend:
+   node server.cjs
+   (Accessible at http://localhost:5000)
+
+2. Start Frontend:
+   npm run dev
+   (Accessible at http://localhost:3000)
+
+3. Re-seed MongoDB database:
+   npm run seed:mongo
+
+========================================================================
+Enjoy using SmartNest!
+========================================================================

@@ -52,7 +52,7 @@ export const AnnouncementsManagement: React.FC<AnnouncementsManagementProps> = (
       priority,
       target_role: targetRole,
       created_by: 'usr-admin-1',
-      author_name: 'Sarah Connor (Admin)',
+      author_name: 'Sunita Deshmukh (Admin)',
       published_at: new Date().toISOString(),
     });
 

@@ -1,0 +1,22 @@
+[
+  {
+    "_id": "ann-01",
+    "community_id": "comm-101",
+    "title": "Elevator Maintenance & Sensor Calibration - Block A",
+    "description": "High-speed elevator in Sunflower Wing A will undergo bi-monthly sensor calibration on Thursday between 2 PM and 4 PM.",
+    "category": "MAINTENANCE",
+    "priority": "HIGH",
+    "author_name": "Sunita Deshmukh (Admin)",
+    "published_at": "2026-10-05T10:00:00.000Z"
+  },
+  {
+    "_id": "ann-02",
+    "community_id": "comm-101",
+    "title": "Diwali Festive Illumination & Club House Get-Together",
+    "description": "Grand Palms RWA invites all residents, owners and children for the community Diwali lantern lighting evening.",
+    "category": "EVENT",
+    "priority": "LOW",
+    "author_name": "Sunita Deshmukh (Admin)",
+    "published_at": "2026-10-06T18:00:00.000Z"
+  }
+]

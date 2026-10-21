@@ -1,0 +1,32 @@
+[
+  {
+    "_id": "comm-101",
+    "name": "Grand Palms Residency",
+    "address": "452 Palm Boulevard, Silver Oak Enclave, Whitefield",
+    "city": "Bengaluru",
+    "state": "Karnataka",
+    "country": "India",
+    "postal_code": "560066",
+    "created_at": "2026-01-01T00:00:00.000Z"
+  },
+  {
+    "_id": "comm-102",
+    "name": "Shanti Niketan Haven",
+    "address": "78 Gandhi Road, Shivaji Nagar",
+    "city": "Pune",
+    "state": "Maharashtra",
+    "country": "India",
+    "postal_code": "411005",
+    "created_at": "2026-01-02T00:00:00.000Z"
+  },
+  {
+    "_id": "comm-103",
+    "name": "Surya Emerald Heights",
+    "address": "12 Banjara Hills Main Rd, Road No. 10",
+    "city": "Hyderabad",
+    "state": "Telangana",
+    "country": "India",
+    "postal_code": "500034",
+    "created_at": "2026-01-03T00:00:00.000Z"
+  }
+]

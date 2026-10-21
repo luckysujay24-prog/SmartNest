@@ -34,6 +34,9 @@ export const PaymentsManagement: React.FC = () => {
 
   const filteredPayments = payments.filter((p) => {
     const bill = bills.find((b) => b.id === p.bill_id);
+    // Privacy boundary: Admins do not reconcile private tenant-to-owner rent
+    if (bill && bill.bill_type === 'RENT') return false;
+
     const user = users.find((u) => u.id === p.user_id);
 
     const matchesSearch =
@@ -67,7 +70,7 @@ export const PaymentsManagement: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement('a');
     link.setAttribute('href', encodedUri);
-    link.setAttribute('download', `communityhub_payments_${new Date().toISOString().slice(0, 10)}.csv`);
+    link.setAttribute('download', `smartnest_society_payments_${new Date().toISOString().slice(0, 10)}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -78,9 +81,9 @@ export const PaymentsManagement: React.FC = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-slate-900">Payments & Escrow Transactions</h1>
+          <h1 className="text-xl font-bold text-slate-900">Society Payments & Escrow Ledger</h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Auditable digital transaction log of all verified rent, utility, and maintenance collections.
+            Auditable digital transaction log of all verified society maintenance, utility, and shared fund collections.
           </p>
         </div>
         <Button

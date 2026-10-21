@@ -1,0 +1,24 @@
+[
+  {
+    "_id": "inc-01",
+    "community_id": "comm-101",
+    "title": "Lift No. 2 Emergency Alarm Buzzer Stuck",
+    "description": "Sunflower Wing elevator 2 emergency alarm began ringing intermittently. Security switched to manual power.",
+    "severity": "MEDIUM",
+    "status": "IN_PROGRESS",
+    "affected_area": "Sunflower Wing A Ground Floor Lift Lobby",
+    "reported_by": "Suresh Reddy (Gate Watchman)",
+    "created_at": "2026-10-07T08:00:00.000Z"
+  },
+  {
+    "_id": "inc-02",
+    "community_id": "comm-101",
+    "title": "Basement -1 Water Sprinkler Valve Weeping",
+    "description": "Minor drip noticed near Parking Bay 14 fire suppression pipe.",
+    "severity": "LOW",
+    "status": "REPORTED",
+    "affected_area": "Basement -1 Parking Bay 14",
+    "reported_by": "Suresh Reddy (Gate Watchman)",
+    "created_at": "2026-10-07T11:00:00.000Z"
+  }
+]

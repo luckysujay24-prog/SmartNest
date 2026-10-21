@@ -13,7 +13,11 @@ interface AuthContextType {
     email: string;
     phone: string;
     role: UserRole;
+    community_id?: string;
+    apartment_name: string;
+    apartment_address: string;
     flat_id?: string;
+    flat_number?: string;
   }) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   updateProfile: (updates: Partial<User>) => void;
@@ -42,12 +46,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       }
     }
 
-    // Default to admin for seamless evaluation if no session
-    const defaultAdmin = users.find((u) => u.role === 'ADMIN') || users[0] || null;
-    if (defaultAdmin) {
-      setCurrentUser(defaultAdmin);
-      localStorage.setItem(AUTH_USER_KEY, defaultAdmin.id);
-    }
+    // If no active session, leave unauthenticated so Landing Page with Sign In is rendered
+    setCurrentUser(null);
   }, []);
 
   useEffect(() => {
@@ -56,9 +56,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return () => unsubscribe();
   }, [refreshUsers]);
 
-  const login = async (email: string): Promise<{ success: boolean; error?: string }> => {
+  const login = async (email: string, password?: string): Promise<{ success: boolean; error?: string }> => {
     const users = storage.getUsers();
-    const user = users.find((u) => u.email.toLowerCase() === email.toLowerCase());
+    let cleanEmail = (email || '').trim().toLowerCase();
+    if (cleanEmail === 'admin@smartnest.com') {
+      cleanEmail = 'admin@communityhub.com';
+    }
+    const user = users.find((u) => u.email.toLowerCase() === cleanEmail);
 
     if (!user) {
       return { success: false, error: 'No account found with this email address.' };
@@ -66,6 +70,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (!user.is_active) {
       return { success: false, error: 'Account has been deactivated by the community administrator.' };
+    }
+
+    if (password && password !== 'password123') {
+      return { success: false, error: 'Invalid email or password.' };
     }
 
     setCurrentUser(user);
@@ -96,11 +104,43 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     email: string;
     phone: string;
     role: UserRole;
+    community_id?: string;
+    apartment_name: string;
+    apartment_address: string;
     flat_id?: string;
+    flat_number?: string;
   }): Promise<{ success: boolean; error?: string }> => {
     const users = storage.getUsers();
     if (users.some((u) => u.email.toLowerCase() === data.email.toLowerCase())) {
       return { success: false, error: 'An account with this email already exists.' };
+    }
+
+    let communityId = data.community_id;
+    let apartmentName = data.apartment_name?.trim();
+    let apartmentAddress = data.apartment_address?.trim();
+
+    if (!communityId) {
+      const communities = storage.getCommunities();
+      const existingComm = communities.find(
+        (c) => c.name.toLowerCase() === apartmentName.toLowerCase()
+      );
+      if (existingComm) {
+        communityId = existingComm.id;
+        apartmentName = existingComm.name;
+        apartmentAddress = existingComm.address;
+      } else {
+        const newComm = storage.createCommunity({
+          name: apartmentName,
+          address: apartmentAddress || 'Address on record',
+          city: 'Bengaluru',
+          state: 'Karnataka',
+          country: 'India',
+          postal_code: '560001',
+        });
+        communityId = newComm.id;
+        apartmentName = newComm.name;
+        apartmentAddress = newComm.address;
+      }
     }
 
     const newUser = storage.createUser({
@@ -109,6 +149,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       phone: data.phone,
       role: data.role,
       is_active: true,
+      community_id: communityId,
+      apartment_name: apartmentName,
+      apartment_address: apartmentAddress,
       flat_id: data.flat_id,
       avatar_url: `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(data.name)}`,
     });

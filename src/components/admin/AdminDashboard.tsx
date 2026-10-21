@@ -59,10 +59,13 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
   const occupiedFlats = flats.filter((f) => f.occupancy_status === 'OCCUPIED').length;
   const vacantFlats = totalFlats - occupiedFlats;
 
-  const pendingBills = bills.filter((b) => b.status === 'PENDING' || b.status === 'OVERDUE');
+  // Privacy boundary: Admin only monitors society maintenance & common bills
+  const societyBills = bills.filter((b) => b.bill_type !== 'RENT');
+  const pendingBills = societyBills.filter((b) => b.status === 'PENDING' || b.status === 'OVERDUE');
   const outstandingAmount = pendingBills.reduce((sum, b) => sum + b.amount, 0);
 
-  const successfulPayments = payments.filter((p) => p.status === 'SUCCESS');
+  const societyBillIds = new Set(societyBills.map((b) => b.id));
+  const successfulPayments = payments.filter((p) => p.status === 'SUCCESS' && societyBillIds.has(p.bill_id));
   const monthlyCollection = successfulPayments.reduce((sum, p) => sum + p.amount, 0);
 
   const openComplaints = complaints.filter(
@@ -136,7 +139,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* Monthly Collections */}
         <Card hoverable onClick={() => onNavigateTab('payments')} className="cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Total Collections</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Society Collections</span>
             <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <TrendingUp className="w-4 h-4" />
             </div>
@@ -146,7 +149,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               ₹{monthlyCollection.toLocaleString('en-IN')}
             </span>
             <div className="text-xs text-slate-500 mt-1 flex items-center gap-1">
-              <span>{successfulPayments.length} verified transactions</span>
+              <span>{successfulPayments.length} verified society payments</span>
             </div>
           </div>
         </Card>
@@ -154,7 +157,7 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
         {/* Outstanding Dues */}
         <Card hoverable onClick={() => onNavigateTab('bills')} className="cursor-pointer">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Outstanding Dues</span>
+            <span className="text-xs font-semibold uppercase tracking-wider text-slate-500">Society Maintenance Dues</span>
             <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
               <CreditCard className="w-4 h-4" />
             </div>

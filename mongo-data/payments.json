@@ -1,0 +1,28 @@
+[
+  {
+    "_id": "pay-01",
+    "bill_id": "bill-maint-01",
+    "user_id": "usr-tenant-1",
+    "amount": 5000,
+    "payment_method": "UPI",
+    "payment_method_title": "UPI Transfer (GooglePay)",
+    "payment_provider": "UPI",
+    "transaction_id": "UPI-GPAY-983421045",
+    "status": "SUCCESS",
+    "payment_date": "2026-09-04T11:20:00.000Z",
+    "created_at": "2026-09-04T11:20:00.000Z"
+  },
+  {
+    "_id": "pay-02",
+    "bill_id": "bill-rent-01",
+    "user_id": "usr-tenant-1",
+    "amount": 46000,
+    "payment_method": "NET_BANKING",
+    "payment_method_title": "IMPS Direct Owner Account Transfer",
+    "payment_provider": "HDFC Direct",
+    "transaction_id": "HDFC-IMPS-774910321",
+    "status": "SUCCESS",
+    "payment_date": "2026-09-03T15:45:00.000Z",
+    "created_at": "2026-09-03T15:45:00.000Z"
+  }
+]

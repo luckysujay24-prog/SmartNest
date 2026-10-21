@@ -44,10 +44,10 @@ export const FlatsManagement: React.FC = () => {
   const [ownerId, setOwnerId] = useState('');
   const [tenantId, setTenantId] = useState('');
 
-  // Assign Modal
+  // Assign Modal (Only for Owner assignment by Admin; Tenants are assigned by Owners)
   const [assignModalData, setAssignModalData] = useState<{
     isOpen: boolean;
-    type: 'OWNER' | 'TENANT';
+    type: 'OWNER';
     flat: EnrichedFlat | null;
     selectedUserId: string;
   }>({
@@ -107,13 +107,13 @@ export const FlatsManagement: React.FC = () => {
         area_sqft: Number(areaSqft),
         rent_amount: Number(rentAmount),
         maintenance_amount: Number(maintenanceAmount),
-        occupancy_status: tenantId ? 'OCCUPIED' : occupancyStatus,
+        occupancy_status: 'VACANT',
       },
       ownerId || undefined,
-      tenantId || undefined
+      undefined
     );
 
-    success('Flat Created', `Unit ${flatNumber.toUpperCase()} added to inventory.`);
+    success('Flat Created', `Unit ${flatNumber.toUpperCase()} added to inventory. Property Owner can assign tenants.`);
     setIsAddModalOpen(false);
     resetAddForm();
   };
@@ -139,13 +139,8 @@ export const FlatsManagement: React.FC = () => {
   const handleSaveAssignment = () => {
     if (!assignModalData.flat || !assignModalData.selectedUserId) return;
 
-    if (assignModalData.type === 'OWNER') {
-      storage.assignOwner(assignModalData.flat.id, assignModalData.selectedUserId);
-      success('Owner Assigned', `Updated owner for Flat ${assignModalData.flat.flat_number}.`);
-    } else {
-      storage.assignTenant(assignModalData.flat.id, assignModalData.selectedUserId);
-      success('Tenant Assigned', `Assigned tenant to Flat ${assignModalData.flat.flat_number}.`);
-    }
+    storage.assignOwner(assignModalData.flat.id, assignModalData.selectedUserId);
+    success('Owner Assigned', `Updated owner for Flat ${assignModalData.flat.flat_number}.`);
 
     setAssignModalData({ isOpen: false, type: 'OWNER', flat: null, selectedUserId: '' });
   };
@@ -287,29 +282,19 @@ export const FlatsManagement: React.FC = () => {
                           <span className="text-[10px] text-slate-400 block">{flat.tenant.phone}</span>
                         </div>
                       ) : (
-                        <button
-                          onClick={() =>
-                            setAssignModalData({
-                              isOpen: true,
-                              type: 'TENANT',
-                              flat,
-                              selectedUserId: tenantsList[0]?.id || '',
-                            })
-                          }
-                          className="text-xs text-emerald-600 font-semibold hover:underline"
-                        >
-                          + Assign Tenant
-                        </button>
+                        <span className="text-[11px] text-slate-400 italic">
+                          Vacant (Assigned by Owner)
+                        </span>
                       )}
                     </td>
 
                     {/* Rent / Maintenance */}
                     <td className="px-4 py-3">
-                      <span className="font-semibold text-slate-900">
-                        ₹{flat.rent_amount.toLocaleString('en-IN')}/mo
+                      <span className="font-bold text-slate-900 text-sm block">
+                        Maint: ₹{flat.maintenance_amount.toLocaleString('en-IN')}/mo
                       </span>
-                      <span className="text-[11px] text-slate-500 block">
-                        Maint: ₹{flat.maintenance_amount.toLocaleString('en-IN')}
+                      <span className="text-[10px] text-slate-400">
+                        (Est. Rent: ₹{flat.rent_amount.toLocaleString('en-IN')})
                       </span>
                     </td>
 
@@ -436,7 +421,7 @@ export const FlatsManagement: React.FC = () => {
 
           <div className="grid grid-cols-2 gap-3 pt-2 border-t border-slate-100">
             <Select
-              label="Assign Owner (Optional)"
+              label="Assign Owner (Society Registry)"
               value={ownerId}
               onChange={(e) => setOwnerId(e.target.value)}
             >
@@ -448,18 +433,14 @@ export const FlatsManagement: React.FC = () => {
               ))}
             </Select>
 
-            <Select
-              label="Assign Tenant (Optional)"
-              value={tenantId}
-              onChange={(e) => setTenantId(e.target.value)}
-            >
-              <option value="">-- No Active Tenant (Vacant) --</option>
-              {tenantsList.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.name} ({t.email})
-                </option>
-              ))}
-            </Select>
+            <div className="p-3 bg-blue-50/70 border border-blue-200/80 rounded-xl text-xs text-blue-900 flex flex-col justify-center">
+              <span className="font-bold flex items-center gap-1">
+                🔒 Tenant Lease Privacy
+              </span>
+              <span className="text-[11px] text-blue-700 mt-0.5 leading-relaxed">
+                Tenants are selected, leased, and onboarded directly by the registered Property Owner via their Owner Portal.
+              </span>
+            </div>
           </div>
 
           <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
@@ -473,21 +454,21 @@ export const FlatsManagement: React.FC = () => {
         </form>
       </Modal>
 
-      {/* Assign Owner / Tenant Modal */}
+      {/* Assign Owner Modal */}
       <Modal
         isOpen={assignModalData.isOpen}
         onClose={() => setAssignModalData({ ...assignModalData, isOpen: false })}
-        title={`Assign ${assignModalData.type === 'OWNER' ? 'Property Owner' : 'Resident Tenant'}`}
-        subtitle={`Linking to Flat ${assignModalData.flat?.flat_number}`}
+        title="Assign Property Owner"
+        subtitle={`Record legal ownership for Flat ${assignModalData.flat?.flat_number}`}
         maxWidth="md"
       >
         <div className="space-y-4 text-left">
           <Select
-            label={`Choose ${assignModalData.type === 'OWNER' ? 'Owner' : 'Tenant'}`}
+            label="Choose Registered Owner"
             value={assignModalData.selectedUserId}
             onChange={(e) => setAssignModalData({ ...assignModalData, selectedUserId: e.target.value })}
           >
-            {(assignModalData.type === 'OWNER' ? ownersList : tenantsList).map((u) => (
+            {ownersList.map((u) => (
               <option key={u.id} value={u.id}>
                 {u.name} — {u.email} ({u.phone})
               </option>
@@ -503,7 +484,7 @@ export const FlatsManagement: React.FC = () => {
               Cancel
             </Button>
             <Button variant="primary" size="sm" onClick={handleSaveAssignment}>
-              Confirm Assignment
+              Confirm Owner Assignment
             </Button>
           </div>
         </div>

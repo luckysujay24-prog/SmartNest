@@ -26,9 +26,16 @@ import {
   AllocationMethod,
   ComplaintStatus,
   WorkerAvailability,
+  ServiceBooking,
+  PrivateMessage,
+  VisitorLog,
+  VisitorStatus,
+  WatchmanIncidentReport,
+  IncidentStatus,
 } from '../types';
 
 import {
+  SEED_COMMUNITIES,
   SEED_COMMUNITY,
   SEED_BUILDINGS,
   SEED_USERS,
@@ -45,9 +52,17 @@ import {
   SEED_SERVICES,
   SEED_NOTIFICATIONS,
   SEED_AUDIT_LOGS,
+  SEED_BOOKINGS,
+  SEED_PRIVATE_MESSAGES,
+  SEED_VISITOR_LOGS,
+  SEED_INCIDENT_REPORTS,
 } from './seedData';
 
+const STORAGE_VERSION_KEY = 'communityhub_schema_version';
+const CURRENT_STORAGE_VERSION = 'v3_multi_apt_security';
+
 const STORAGE_KEYS = {
+  COMMUNITIES: 'communityhub_communities',
   COMMUNITY: 'communityhub_community',
   BUILDINGS: 'communityhub_buildings',
   USERS: 'communityhub_users',
@@ -64,6 +79,10 @@ const STORAGE_KEYS = {
   SERVICES: 'communityhub_services',
   NOTIFICATIONS: 'communityhub_notifications',
   AUDIT_LOGS: 'communityhub_audit_logs',
+  BOOKINGS: 'communityhub_service_bookings',
+  PRIVATE_MESSAGES: 'communityhub_private_messages',
+  VISITOR_LOGS: 'communityhub_visitor_logs',
+  INCIDENT_REPORTS: 'communityhub_incident_reports',
 };
 
 type Listener = () => void;
@@ -110,7 +129,12 @@ class StorageService {
   }
 
   public initIfEmpty(forceReset = false): void {
-    if (forceReset || !localStorage.getItem(STORAGE_KEYS.USERS)) {
+    const existingVersion = localStorage.getItem(STORAGE_VERSION_KEY);
+    const needsMigration = existingVersion !== CURRENT_STORAGE_VERSION;
+
+    if (forceReset || needsMigration || !localStorage.getItem(STORAGE_KEYS.USERS)) {
+      localStorage.setItem(STORAGE_VERSION_KEY, CURRENT_STORAGE_VERSION);
+      localStorage.setItem(STORAGE_KEYS.COMMUNITIES, JSON.stringify(SEED_COMMUNITIES));
       localStorage.setItem(STORAGE_KEYS.COMMUNITY, JSON.stringify(SEED_COMMUNITY));
       localStorage.setItem(STORAGE_KEYS.BUILDINGS, JSON.stringify(SEED_BUILDINGS));
       localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(SEED_USERS));
@@ -127,6 +151,10 @@ class StorageService {
       localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(SEED_SERVICES));
       localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(SEED_NOTIFICATIONS));
       localStorage.setItem(STORAGE_KEYS.AUDIT_LOGS, JSON.stringify(SEED_AUDIT_LOGS));
+      localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(SEED_BOOKINGS));
+      localStorage.setItem(STORAGE_KEYS.PRIVATE_MESSAGES, JSON.stringify(SEED_PRIVATE_MESSAGES));
+      localStorage.setItem(STORAGE_KEYS.VISITOR_LOGS, JSON.stringify(SEED_VISITOR_LOGS));
+      localStorage.setItem(STORAGE_KEYS.INCIDENT_REPORTS, JSON.stringify(SEED_INCIDENT_REPORTS));
       this.notify();
     }
   }
@@ -172,9 +200,32 @@ class StorageService {
     return users[index];
   }
 
-  // ==================== COMMUNITY & BUILDINGS ====================
-  public getCommunity(): Community {
-    return this.getItem<Community>(STORAGE_KEYS.COMMUNITY, SEED_COMMUNITY);
+  // ==================== COMMUNITIES & APARTMENTS ====================
+  public getCommunities(): Community[] {
+    return this.getItem<Community[]>(STORAGE_KEYS.COMMUNITIES, SEED_COMMUNITIES);
+  }
+
+  public getCommunity(id?: string): Community {
+    const list = this.getCommunities();
+    if (id) {
+      const found = list.find((c) => c.id === id);
+      if (found) return found;
+    }
+    return this.getItem<Community>(STORAGE_KEYS.COMMUNITY, list[0] || SEED_COMMUNITY);
+  }
+
+  public createCommunity(data: Omit<Community, 'id' | 'created_at' | 'updated_at'>): Community {
+    const communities = this.getCommunities();
+    const newComm: Community = {
+      ...data,
+      id: `comm-${Date.now()}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    communities.push(newComm);
+    this.setItem(STORAGE_KEYS.COMMUNITIES, communities);
+    this.syncDocToMongo('communities', newComm);
+    return newComm;
   }
 
   public updateCommunity(data: Partial<Community>): Community {
@@ -995,6 +1046,295 @@ class StorageService {
     // Keep last 150 entries
     if (logs.length > 150) logs.pop();
     this.setItem(STORAGE_KEYS.AUDIT_LOGS, logs);
+  }
+
+  // ==================== SERVICE BOOKINGS (TIME SLOTS) ====================
+  public getBookings(): ServiceBooking[] {
+    return this.getItem<ServiceBooking[]>(STORAGE_KEYS.BOOKINGS, []);
+  }
+
+  public getUserBookings(userId: string): ServiceBooking[] {
+    return this.getBookings().filter((b) => b.user_id === userId);
+  }
+
+  public getWorkerBookings(workerId: string): ServiceBooking[] {
+    return this.getBookings().filter((b) => b.worker_id === workerId);
+  }
+
+  public createBooking(
+    data: Omit<ServiceBooking, 'id' | 'created_at'>
+  ): ServiceBooking {
+    const bookings = this.getBookings();
+    const newBooking: ServiceBooking = {
+      ...data,
+      id: `bk-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      created_at: new Date().toISOString(),
+    };
+    bookings.unshift(newBooking);
+    this.setItem(STORAGE_KEYS.BOOKINGS, bookings);
+
+    // Notify user
+    this.addNotification({
+      user_id: data.user_id,
+      title: 'Service Appointment Confirmed',
+      message: `Your booking with ${data.worker_name} for ${data.time_slot} on ${data.booking_date} is scheduled.`,
+      type: 'TASK',
+      reference_id: newBooking.id,
+    });
+
+    // Notify worker if user_id exists for worker
+    if (data.worker_id) {
+      const worker = this.getWorkers().find((w) => w.id === data.worker_id);
+      if (worker) {
+        this.addNotification({
+          user_id: worker.user_id,
+          title: 'New Service Slot Booked',
+          message: `${data.user_name} (Flat ${data.flat_number}) booked slot: ${data.time_slot} on ${data.booking_date}.`,
+          type: 'TASK',
+          reference_id: newBooking.id,
+        });
+
+        // Automatically dispatch 1-on-1 private chat message straight to the technician
+        if (worker.user_id) {
+          const autoChatMessage = `Hello ${data.worker_name}, I have confirmed an appointment for "${data.service_name}" on ${data.booking_date} (${data.time_slot}) for Flat ${data.flat_number}.\n\nProblem details: "${data.issue_description}".\nPlease let me know if you need any additional access details.`;
+          this.sendPrivateMessage(data.user_id, worker.user_id, autoChatMessage, 'Service Booking Dispatch');
+        }
+      }
+    }
+
+    this.addAuditLog(data.user_id, 'BOOK_SERVICE_SLOT', 'service_bookings', newBooking.id, null, newBooking);
+
+    // Sync to MongoDB server if running
+    this.syncDocToMongo('service_bookings', newBooking);
+
+    return newBooking;
+  }
+
+  public updateBookingStatus(id: string, status: ServiceBooking['status']): boolean {
+    const bookings = this.getBookings();
+    const idx = bookings.findIndex((b) => b.id === id);
+    if (idx === -1) return false;
+    bookings[idx].status = status;
+    this.setItem(STORAGE_KEYS.BOOKINGS, bookings);
+    return true;
+  }
+
+  public setWorkerAvailability(workerId: string, availability: WorkerAvailability): boolean {
+    const workers = this.getWorkers();
+    const idx = workers.findIndex((w) => w.id === workerId);
+    if (idx === -1) return false;
+    workers[idx].availability = availability;
+    workers[idx].updated_at = new Date().toISOString();
+    this.setItem(STORAGE_KEYS.WORKERS, workers);
+    return true;
+  }
+
+  // ==================== 1-ON-1 PRIVATE CHAT ====================
+  // Strictly private between the two participants. Outsiders cannot read each other's messages.
+  public getPrivateMessages(): PrivateMessage[] {
+    return this.getItem<PrivateMessage[]>(STORAGE_KEYS.PRIVATE_MESSAGES, []);
+  }
+
+  public getUserConversations(userId: string): { partnerId: string; lastMessage: PrivateMessage; unreadCount: number }[] {
+    const all = this.getPrivateMessages();
+    const partnerMap = new Map<string, { lastMessage: PrivateMessage; unreadCount: number }>();
+
+    all.forEach((msg) => {
+      const isSender = msg.sender_id === userId;
+      const isRecipient = msg.recipient_id === userId;
+      if (!isSender && !isRecipient) return;
+
+      const partnerId = isSender ? msg.recipient_id : msg.sender_id;
+      const current = partnerMap.get(partnerId);
+
+      const unreadDelta = isRecipient && !msg.is_read ? 1 : 0;
+
+      if (!current) {
+        partnerMap.set(partnerId, { lastMessage: msg, unreadCount: unreadDelta });
+      } else {
+        if (new Date(msg.created_at) > new Date(current.lastMessage.created_at)) {
+          current.lastMessage = msg;
+        }
+        current.unreadCount += unreadDelta;
+      }
+    });
+
+    return Array.from(partnerMap.entries()).map(([partnerId, data]) => ({
+      partnerId,
+      lastMessage: data.lastMessage,
+      unreadCount: data.unreadCount,
+    }));
+  }
+
+  public getConversation(user1Id: string, user2Id: string): PrivateMessage[] {
+    const all = this.getPrivateMessages();
+    return all
+      .filter(
+        (m) =>
+          (m.sender_id === user1Id && m.recipient_id === user2Id) ||
+          (m.sender_id === user2Id && m.recipient_id === user1Id)
+      )
+      .sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+  }
+
+  public sendPrivateMessage(
+    senderId: string,
+    recipientId: string,
+    message: string,
+    tag = 'General'
+  ): PrivateMessage {
+    const all = this.getPrivateMessages();
+    const sender = this.getUser(senderId);
+    const recipient = this.getUser(recipientId);
+
+    const newMsg: PrivateMessage = {
+      id: `msg-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      sender_id: senderId,
+      recipient_id: recipientId,
+      sender_name: sender ? sender.name : 'Resident',
+      recipient_name: recipient ? recipient.name : 'Resident',
+      sender_avatar: sender?.avatar_url,
+      message,
+      tag,
+      is_read: false,
+      created_at: new Date().toISOString(),
+    };
+
+    all.push(newMsg);
+    this.setItem(STORAGE_KEYS.PRIVATE_MESSAGES, all);
+
+    // Notify recipient
+    this.addNotification({
+      user_id: recipientId,
+      title: `Private Message from ${sender ? sender.name : 'Resident'}`,
+      message: message.length > 60 ? `${message.slice(0, 57)}...` : message,
+      type: 'SYSTEM',
+      reference_id: newMsg.id,
+    });
+
+    // Sync to MongoDB server
+    this.syncDocToMongo('private_messages', newMsg);
+
+    return newMsg;
+  }
+
+  public markConversationAsRead(senderPartnerId: string, currentUserId: string): void {
+    const all = this.getPrivateMessages();
+    let changed = false;
+    const updated = all.map((m) => {
+      if (m.sender_id === senderPartnerId && m.recipient_id === currentUserId && !m.is_read) {
+        changed = true;
+        return { ...m, is_read: true };
+      }
+      return m;
+    });
+
+    if (changed) {
+      this.setItem(STORAGE_KEYS.PRIVATE_MESSAGES, updated);
+    }
+  }
+
+  public getUnreadMessageCount(userId: string): number {
+    const all = this.getPrivateMessages();
+    return all.filter((m) => m.recipient_id === userId && !m.is_read).length;
+  }
+
+  // ==================== VISITOR ENTRY REGISTER (OUTSIDERS / SECURITY) ====================
+  public getVisitorLogs(communityId?: string): VisitorLog[] {
+    const list = this.getItem<VisitorLog[]>(STORAGE_KEYS.VISITOR_LOGS, SEED_VISITOR_LOGS);
+    if (!communityId) return list;
+    return list.filter((v) => v.community_id === communityId);
+  }
+
+  public createVisitorEntry(data: Omit<VisitorLog, 'id' | 'created_at'>): VisitorLog {
+    const logs = this.getItem<VisitorLog[]>(STORAGE_KEYS.VISITOR_LOGS, SEED_VISITOR_LOGS);
+    const newLog: VisitorLog = {
+      ...data,
+      id: `vis-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      created_at: new Date().toISOString(),
+    };
+    logs.unshift(newLog);
+    this.setItem(STORAGE_KEYS.VISITOR_LOGS, logs);
+    this.addAuditLog(data.logged_by_watchman_id, 'REGISTER_VISITOR', 'visitor_logs', newLog.id, null, newLog);
+    this.syncDocToMongo('visitor_logs', newLog);
+    return newLog;
+  }
+
+  public updateVisitorStatus(
+    id: string,
+    status: VisitorStatus,
+    exitTime?: string,
+    notes?: string
+  ): VisitorLog | null {
+    const logs = this.getItem<VisitorLog[]>(STORAGE_KEYS.VISITOR_LOGS, SEED_VISITOR_LOGS);
+    const idx = logs.findIndex((l) => l.id === id);
+    if (idx === -1) return null;
+    logs[idx].status = status;
+    if (exitTime) logs[idx].exit_time = exitTime;
+    if (notes) logs[idx].notes = notes;
+    this.setItem(STORAGE_KEYS.VISITOR_LOGS, logs);
+    return logs[idx];
+  }
+
+  // ==================== WATCHMAN INCIDENT & SERVICE PROBLEMS LOG ====================
+  public getIncidentReports(communityId?: string): WatchmanIncidentReport[] {
+    const list = this.getItem<WatchmanIncidentReport[]>(STORAGE_KEYS.INCIDENT_REPORTS, SEED_INCIDENT_REPORTS);
+    if (!communityId) return list;
+    return list.filter((r) => r.community_id === communityId);
+  }
+
+  public createIncidentReport(data: Omit<WatchmanIncidentReport, 'id' | 'created_at'>): WatchmanIncidentReport {
+    const reports = this.getItem<WatchmanIncidentReport[]>(STORAGE_KEYS.INCIDENT_REPORTS, SEED_INCIDENT_REPORTS);
+    const newReport: WatchmanIncidentReport = {
+      ...data,
+      id: `inc-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
+      created_at: new Date().toISOString(),
+    };
+    reports.unshift(newReport);
+    this.setItem(STORAGE_KEYS.INCIDENT_REPORTS, reports);
+    this.addAuditLog(data.watchman_id, 'LOG_INCIDENT', 'incident_reports', newReport.id, null, newReport);
+    this.syncDocToMongo('incident_reports', newReport);
+    return newReport;
+  }
+
+  public updateIncidentStatus(
+    id: string,
+    status: IncidentStatus,
+    resolvedAt?: string
+  ): WatchmanIncidentReport | null {
+    const reports = this.getItem<WatchmanIncidentReport[]>(STORAGE_KEYS.INCIDENT_REPORTS, SEED_INCIDENT_REPORTS);
+    const idx = reports.findIndex((r) => r.id === id);
+    if (idx === -1) return null;
+    reports[idx].status = status;
+    if (resolvedAt) reports[idx].resolved_at = resolvedAt;
+    this.setItem(STORAGE_KEYS.INCIDENT_REPORTS, reports);
+    return reports[idx];
+  }
+
+  // ==================== MONGODB COMPASS BACKGROUND SYNC ====================
+  private async syncDocToMongo(collection: string, doc: any) {
+    try {
+      await fetch(`http://localhost:5000/api/${collection}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(doc),
+      });
+    } catch {
+      // Local server might not be running or offline, silently ignore
+    }
+  }
+
+  public async checkMongoStatus(): Promise<{ connected: boolean; database: string; count?: number }> {
+    try {
+      const res = await fetch('http://localhost:5000/api/health', { signal: AbortSignal.timeout(2000) });
+      if (res.ok) {
+        const data = await res.json();
+        return { connected: true, database: data.database || 'community_hub', count: data.collectionsCount };
+      }
+    } catch {
+      // Fallback
+    }
+    return { connected: false, database: 'community_hub' };
   }
 }
 

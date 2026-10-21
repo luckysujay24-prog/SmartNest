@@ -1,0 +1,44 @@
+[
+  {
+    "_id": "bld-01",
+    "community_id": "comm-101",
+    "name": "Sunflower Wing A",
+    "total_floors": 10
+  },
+  {
+    "_id": "bld-02",
+    "community_id": "comm-101",
+    "name": "Lotus Wing B",
+    "total_floors": 8
+  },
+  {
+    "_id": "bld-03",
+    "community_id": "comm-101",
+    "name": "Orchid Wing C",
+    "total_floors": 6
+  },
+  {
+    "_id": "bld-04",
+    "community_id": "comm-102",
+    "name": "Gulmohar Wing",
+    "total_floors": 9
+  },
+  {
+    "_id": "bld-05",
+    "community_id": "comm-102",
+    "name": "Parijat Wing",
+    "total_floors": 7
+  },
+  {
+    "_id": "bld-06",
+    "community_id": "comm-103",
+    "name": "Emerald Tower",
+    "total_floors": 12
+  },
+  {
+    "_id": "bld-07",
+    "community_id": "comm-103",
+    "name": "Ruby Tower",
+    "total_floors": 11
+  }
+]

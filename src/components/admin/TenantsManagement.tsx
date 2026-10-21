@@ -87,7 +87,7 @@ export const TenantsManagement: React.FC = () => {
         <div>
           <h1 className="text-xl font-bold text-slate-900">Resident Tenants Directory</h1>
           <p className="text-xs text-slate-500 mt-0.5">
-            Active residential leaseholders residing in Grand Palms units.
+            Verified resident leaseholders. (Flats are leased and assigned directly by respective Property Owners).
           </p>
         </div>
         <Button
@@ -182,7 +182,7 @@ export const TenantsManagement: React.FC = () => {
           <Input
             label="Full Name"
             required
-            placeholder="e.g. Emily Watson"
+            placeholder="e.g. Ananya Iyer"
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
@@ -191,7 +191,7 @@ export const TenantsManagement: React.FC = () => {
             label="Email Address"
             type="email"
             required
-            placeholder="e.g. emily.watson@example.com"
+            placeholder="e.g. ananya.iyer@example.com"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />

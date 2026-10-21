@@ -1,0 +1,62 @@
+[
+  {
+    "_id": "bill-maint-01",
+    "community_id": "comm-101",
+    "flat_id": "flat-a-301",
+    "bill_type": "MAINTENANCE",
+    "title": "Monthly Society Maintenance - September 2026",
+    "description": "Society security, lift upkeep, landscaping & common lighting share",
+    "billing_period_start": "2026-09-01",
+    "billing_period_end": "2026-09-30",
+    "amount": 5000,
+    "due_date": "2026-09-15",
+    "status": "PAID",
+    "created_by": "usr-admin-1",
+    "created_at": "2026-09-01T10:00:00.000Z"
+  },
+  {
+    "_id": "bill-maint-02",
+    "community_id": "comm-101",
+    "flat_id": "flat-a-101",
+    "bill_type": "MAINTENANCE",
+    "title": "Monthly Society Maintenance - September 2026",
+    "description": "Society security, lift upkeep & common lighting share",
+    "billing_period_start": "2026-09-01",
+    "billing_period_end": "2026-09-30",
+    "amount": 3800,
+    "due_date": "2026-09-15",
+    "status": "PAID",
+    "created_by": "usr-admin-1",
+    "created_at": "2026-09-01T10:00:00.000Z"
+  },
+  {
+    "_id": "bill-elec-01",
+    "community_id": "comm-101",
+    "flat_id": "flat-a-301",
+    "bill_type": "ELECTRICITY",
+    "title": "Power Sub-Meter Reading - September 2026",
+    "description": "390 units consumed @ ₹7.50 / kWh + fixed charge",
+    "billing_period_start": "2026-09-01",
+    "billing_period_end": "2026-09-30",
+    "amount": 2925,
+    "due_date": "2026-10-05",
+    "status": "PENDING",
+    "created_by": "usr-admin-1",
+    "created_at": "2026-10-01T10:00:00.000Z"
+  },
+  {
+    "_id": "bill-rent-01",
+    "community_id": "comm-101",
+    "flat_id": "flat-a-301",
+    "bill_type": "RENT",
+    "title": "Monthly House Rent - September 2026",
+    "description": "Private lease rental invoice issued by property owner Priya Sharma",
+    "billing_period_start": "2026-09-01",
+    "billing_period_end": "2026-09-30",
+    "amount": 46000,
+    "due_date": "2026-09-05",
+    "status": "PAID",
+    "created_by": "usr-owner-2",
+    "created_at": "2026-09-01T08:00:00.000Z"
+  }
+]

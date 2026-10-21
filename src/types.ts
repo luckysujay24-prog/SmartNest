@@ -3,7 +3,7 @@
 // Corresponds strictly to Document 05 Schema
 // ==========================================
 
-export type UserRole = 'ADMIN' | 'OWNER' | 'TENANT' | 'WORKER';
+export type UserRole = 'SUPER_ADMIN' | 'ADMIN' | 'OWNER' | 'TENANT' | 'WORKER' | 'SECURITY';
 
 export type WorkerCategory =
   | 'Security'
@@ -82,7 +82,9 @@ export type NotificationType =
   | 'ANNOUNCEMENT'
   | 'COMPLAINT'
   | 'TASK'
-  | 'SYSTEM';
+  | 'SYSTEM'
+  | 'VISITOR'
+  | 'INCIDENT';
 
 // 5.2 users
 export interface User {
@@ -95,6 +97,10 @@ export interface User {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  // Apartment / Community association (compulsory)
+  community_id?: string;
+  apartment_name?: string;
+  apartment_address?: string;
   // helper fields for context
   flat_id?: string;
   worker_id?: string;
@@ -347,4 +353,84 @@ export interface EnrichedComplaint extends Complaint {
   worker_type?: string;
   worker_phone?: string;
   updates?: ComplaintUpdate[];
+}
+
+// 5.18 Service Booking with time slots
+export interface ServiceBooking {
+  id: string;
+  service_id: string;
+  worker_id?: string;
+  user_id: string;
+  user_name: string;
+  user_phone: string;
+  flat_number: string;
+  service_name: string;
+  worker_name: string;
+  worker_phone: string;
+  booking_date: string;
+  time_slot: string; // e.g., "10:00 AM - 11:00 AM"
+  issue_description: string;
+  status: 'CONFIRMED' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
+  created_at: string;
+}
+
+// 5.19 Private 1-on-1 Messages (Strictly private between sender and recipient)
+export interface PrivateMessage {
+  id: string;
+  sender_id: string;
+  recipient_id: string;
+  sender_name: string;
+  recipient_name: string;
+  sender_avatar?: string;
+  message: string;
+  tag?: string;
+  is_read: boolean;
+  created_at: string;
+}
+
+// 5.20 Outsider / Visitor Entry Register for Security Guards / Watchmen
+export type VisitorPurpose = 'DELIVERY' | 'GUEST' | 'SERVICE' | 'CAB' | 'OTHER';
+export type VisitorStatus = 'ALLOWED' | 'DENIED' | 'PENDING' | 'CHECKED_OUT';
+
+export interface VisitorLog {
+  id: string;
+  community_id: string;
+  apartment_name?: string;
+  visitor_name: string;
+  phone: string;
+  purpose: VisitorPurpose;
+  company_or_service?: string; // e.g. Zomato, Swiggy, Amazon, Uber, Urban Company
+  visiting_flat: string;
+  visiting_resident_name?: string;
+  vehicle_number?: string;
+  entry_time: string;
+  exit_time?: string;
+  status: VisitorStatus;
+  logged_by_watchman_id: string;
+  logged_by_watchman_name: string;
+  pass_code?: string;
+  notes?: string;
+  created_at: string;
+}
+
+// 5.21 Watchman Incident & Service Problem Reporting
+export type IncidentCategory = 'LIFT' | 'WATER_PUMP' | 'SECURITY_GATE' | 'PARKING' | 'ELECTRICAL' | 'OTHER';
+export type IncidentSeverity = 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
+export type IncidentStatus = 'REPORTED' | 'ACKNOWLEDGED' | 'IN_PROGRESS' | 'RESOLVED';
+
+export interface WatchmanIncidentReport {
+  id: string;
+  community_id: string;
+  apartment_name?: string;
+  watchman_id: string;
+  watchman_name: string;
+  watchman_phone: string;
+  title: string;
+  description: string;
+  category: IncidentCategory;
+  severity: IncidentSeverity;
+  status: IncidentStatus;
+  affected_area?: string; // e.g. Block B Lift 1, Main Gate Barrier, Motor Room 2
+  created_at: string;
+  resolved_at?: string;
 }

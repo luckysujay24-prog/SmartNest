@@ -1,0 +1,35 @@
+[
+  {
+    "_id": "msg-01",
+    "sender_id": "usr-owner-2",
+    "recipient_id": "usr-tenant-1",
+    "sender_name": "Priya Sharma (Owner)",
+    "recipient_name": "Ananya Iyer (Tenant)",
+    "message": "Hello Ananya, hope you are comfortable at Flat A-301. I have issued your September rent invoice.",
+    "tag": "Owner Lease Update",
+    "is_read": true,
+    "created_at": "2026-09-01T08:05:00.000Z"
+  },
+  {
+    "_id": "msg-02",
+    "sender_id": "usr-tenant-1",
+    "recipient_id": "usr-owner-2",
+    "sender_name": "Ananya Iyer (Tenant)",
+    "recipient_name": "Priya Sharma (Owner)",
+    "message": "Thank you Priya ji, I have completed the rent transfer via IMPS and attached the receipt.",
+    "tag": "Rent Cleared",
+    "is_read": true,
+    "created_at": "2026-09-03T15:46:00.000Z"
+  },
+  {
+    "_id": "msg-03",
+    "sender_id": "usr-tenant-1",
+    "recipient_id": "usr-worker-1",
+    "sender_name": "Ananya Iyer",
+    "recipient_name": "Ramesh Verma",
+    "message": "Hello Ramesh Verma, I have booked a slot with you for Apex Electrical Solutions on 2026-10-08 (10:00 AM - 11:00 AM).",
+    "tag": "Service Slot Booking",
+    "is_read": true,
+    "created_at": "2026-10-07T09:02:00.000Z"
+  }
+]
